@@ -14,27 +14,32 @@ import base64
 
 @ensure_annotations
 def read_yaml(path_to_yaml: Path) -> ConfigBox:
-    """reads yaml file and returns
+    """Lit un fichier YAML et retourne un objet ConfigBox.
 
     Args:
-        path_to_yaml (str): path like input
+        path_to_yaml (Path): Chemin du fichier YAML.
 
     Raises:
-        ValueError: if yaml file is empty
-        e: empty file
+        ValueError: Si le fichier YAML est vide ou mal formaté.
 
     Returns:
-        ConfigBox: ConfigBox type
+        ConfigBox: Objet ConfigBox contenant les données YAML.
     """
     try:
-        with open(path_to_yaml) as yaml_file:
-            content = yaml.safe_load(yaml_file)
-            logger.info(f"yaml file: {path_to_yaml} loaded successfully")
-            return ConfigBox(content)
+        with open(path_to_yaml, "r") as yaml_file:
+            content = yaml.safe_load(yaml_file) or {}  # Empêche None
+        
+        if not content:  # Vérifie si le fichier est vide
+            raise ValueError(f"❌ ERREUR: Le fichier YAML {path_to_yaml} est vide !")
+
+        logger.info(f"✅ YAML chargé avec succès: {path_to_yaml}")
+        return ConfigBox(content)
+
     except BoxValueError:
-        raise ValueError("yaml file is empty")
+        raise ValueError(f"❌ ERREUR: Problème avec {path_to_yaml}. Vérifie son contenu.")
     except Exception as e:
         raise e
+
     
 
 
